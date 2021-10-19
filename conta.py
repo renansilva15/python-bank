@@ -5,7 +5,7 @@ from historico import Historico
 
 class Conta:
 
-	__slots__ = ['_numero', '_cliente', '_saldo', '_limite', '_historico']
+	__slots__ = ['_numero', '_cpf', '_saldo', '_limite', '_historico']
 
 
 
@@ -19,9 +19,9 @@ class Conta:
 
 
 
-	def __init__(self, numero, cliente, saldo, limite):
+	def __init__(self, numero, cpf, saldo, limite):
 		self._numero = numero
-		self._cliente = cliente
+		self._cpf = cpf
 		self._saldo = saldo
 		self._limite = limite
 		self._historico = Historico()
@@ -29,7 +29,7 @@ class Conta:
 
 
 
-	'''@property
+	@property
 	def numero(self):
 		return self._numero
 
@@ -41,24 +41,13 @@ class Conta:
 
 
 	@property
-	def cliente(self):
-		return self._cliente
+	def cpf(self):
+		return self.cpf
 
 
-	@cliente.setter
-	def cliente(self, cliente):
-		self._cliente = cliente
-
-
-
-	@property
-	def saldo(self):
-		return self._saldo
-
-
-	@saldo.setter
-	def saldo(self, saldo):
-		self._saldo = saldo
+	@cpf.setter
+	def cpf(self, cpf):
+		self.cpf = cpf
 
 
 
@@ -80,7 +69,18 @@ class Conta:
 
 	@historico.setter
 	def historico(self, historico):
-		self._historico = historico'''
+		self._historico = historico
+
+
+
+	@property
+	def saldo(self):
+		return self._saldo
+
+
+	@saldo.setter
+	def saldo(self, saldo):
+		self._saldo = saldo
 
 
 
@@ -113,8 +113,8 @@ class Conta:
 
 
 	def extrato(self):
-		print('\nNúmero: {}\nTitular: {} {} | CPF: {}\nSaldo: R$ {:.2f}\nLimite: R$ {:.2f}'.format(self._numero, self._cliente.nome, self._cliente.sobrenome, self._cliente.cpf, self._saldo, self._limite))
-		self._historico.mostra()
+		#print('\nNúmero: {}\nTitular: {} {} | CPF: {}\nSaldo: R$ {:.2f}\nLimite: R$ {:.2f}'.format(self._numero, self._cliente.nome, self._cliente.sobrenome, self._cliente.cpf, self._saldo, self._limite))
+	 	return self._historico.mostra()
 
 
 

@@ -14,14 +14,14 @@ class Historico:
 
 
 
-	'''@property
+	@property
 	def abertura(self):
 		return self._abertura
 
 
 	@abertura.setter
 	def abertura(self, abertura):
-		self._abertura = abertura'''
+		self._abertura = abertura
 
 
 
@@ -37,9 +37,15 @@ class Historico:
 
 
 	def mostra(self):
-		print('\nData de abertura: {}'.format(self._abertura))
+		#print('\nData de abertura: {}'.format(self.abertura))
+		aux = '\nData de abertura: {}'.format(self.abertura)
 
 
-		print('\nTransações:\n')
+		#print('\nTransações:\n')
+		aux += '\nTransações:\n'
 		for l in self.transacoes:
-			print(l)
+			#print(l)
+			aux += l
+
+
+		return aux

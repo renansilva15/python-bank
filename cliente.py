@@ -1,13 +1,14 @@
 class Cliente:
 
-	__slots__ = ['_nome', '_sobrenome', '_cpf']
+	__slots__ = ['_nome', '_sobrenome', '_cpf', '_senha']
 
 
 
-	def __init__(self, nome, sobrenome, cpf):
+	def __init__(self, nome, sobrenome, cpf, senha):
 		self._nome = nome
 		self._sobrenome = sobrenome
 		self._cpf = cpf
+		self._senha = senha
 
 
 
@@ -41,3 +42,14 @@ class Cliente:
 	@cpf.setter
 	def cpf(self, cpf):
 		self._cpf = cpf
+
+
+
+	@property
+	def senha(self):
+		return self._senha
+
+
+	@senha.setter
+	def senha(self, senha):
+		self._senha = senha
