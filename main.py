@@ -126,15 +126,12 @@ class Main(QMainWindow, Ui_Main):
 					self.telaInicial.lineEdit_2.setText('')
 
 
-					self.clienteAtual = aux
-					self.contaAtual = self.banco.buscaConta(self.clienteAtual.cpf)
+					self.clienteAtual = aux #
+					self.contaAtual = self.banco.buscaConta(self.clienteAtual.cpf) #
 
 
-					# if(contaAtual):
-					# 	super().telaPrincipal.setupUi(self.stack1, clienteAtual.nome, contaAtual.saldo)
-
-					# else:
-					# 	super().telaPrincipal.setupUi(self.stack1, clienteAtual.nome, 0.0)
+					self.telaPrincipal.label_2.setText(str('Olá %s' %(self.clienteAtual.nome)))
+					self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(self.contaAtual.saldo)))
 
 
 					self.QtStack.setCurrentIndex(1)
@@ -185,7 +182,7 @@ class Main(QMainWindow, Ui_Main):
 					aux2 = self.banco.criaConta(cpf, Conta(Banco.totalContas(), cpf, 0.0, 0.0))
 
 
-					QMessageBox.information(None, '', 'Cadastro realizado!\n\nO número da sua conta é: %d' %(Banco.totalContas()-1))
+					QMessageBox.information(None, '', 'Cadastro realizado.\n\nO número da sua conta é: %d' %(Banco.totalContas()-1))
 					self.QtStack.setCurrentIndex(0)
 
 				else:
@@ -232,6 +229,10 @@ class Main(QMainWindow, Ui_Main):
 						self.telaDeposito.lineEdit_3.setText('')
 						self.telaDeposito.lineEdit_4.setText('')
 						QMessageBox.information(None, '', 'Depósito realizado.')
+
+
+						self.telaPrincipal.label_2.setText(str('Olá %s' %(self.clienteAtual.nome)))
+						self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(self.contaAtual.saldo)))
 						self.QtStack.setCurrentIndex(1)
 
 					else:
@@ -275,6 +276,10 @@ class Main(QMainWindow, Ui_Main):
 						self.telaSaque.lineEdit_3.setText('')
 						self.telaSaque.lineEdit_4.setText('')
 						QMessageBox.information(None, '', 'Saque realizado.')
+
+
+						self.telaPrincipal.label_2.setText(str('Olá %s' %(self.clienteAtual.nome)))
+						self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(self.contaAtual.saldo)))
 						self.QtStack.setCurrentIndex(1)
 
 					else:
@@ -322,6 +327,9 @@ class Main(QMainWindow, Ui_Main):
 								self.telaTransferencia.lineEdit_5.setText('')
 								self.telaTransferencia.lineEdit_4.setText('')
 								QMessageBox.information(None, '', 'Transferência realizada.')
+
+								self.telaPrincipal.label_2.setText(str('Olá %s' %(self.clienteAtual.nome)))
+								self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(self.contaAtual.saldo)))
 								self.QtStack.setCurrentIndex(1)
 
 							else:
@@ -343,7 +351,7 @@ class Main(QMainWindow, Ui_Main):
 				else:
 					self.telaSaque.lineEdit_3.setText('')
 					self.telaSaque.lineEdit_4.setText('')
-					QMessageBox.information(None, '', 'Não forma encontaradas contas com este CPF.')
+					QMessageBox.information(None, '', 'Não foram encontaradas contas com este CPF.')
 
 			else:
 				QMessageBox.information(None, '', 'Valor inválido.')
@@ -354,8 +362,8 @@ class Main(QMainWindow, Ui_Main):
 
 
 	def abrirTelaHistorico(self):
-		self.telaHistorico.lineEdit_3.setText('\nNúmero: {}\nTitular: {} {} | CPF: {}\nSaldo: R$ {:.2f}\nLimite: R$ {:.2f}\n\n{}'.format(self.contaAtual.numero, self.clienteAtual.nome, self.clienteAtual.sobrenome, self.clienteAtual.cpf, self.contaAtual.saldo, self.contaAtual.limite,self.contaAtual.extrato()))
-		self.QtStack.setCurrentIndex(6)
+		self.telaHistorico.textEdit.setText('\nNúmero: {}\nTitular: {} {} | CPF: {}\nSaldo: R$ {:.2f}\nLimite: R$ {:.2f}\n{}'.format(self.contaAtual.numero, self.clienteAtual.nome, self.clienteAtual.sobrenome, self.clienteAtual.cpf, self.contaAtual.saldo, self.contaAtual.limite,self.contaAtual.extrato()))
+		self.QtStack.setCurrentIndex(6) # Mudar a linha acima.
 
 
 

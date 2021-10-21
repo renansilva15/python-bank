@@ -42,7 +42,7 @@ class Historico:
 
 
 		#print('\nTransações:\n')
-		aux += '\nTransações:\n'
+		aux += '\n\nTransações:\n'
 		for l in self.transacoes:
 			#print(l)
 			aux += l

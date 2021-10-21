@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class TelaPrincipal(object):
-    def setupUi(self, MainWindow, nome = '', saldo = 0.0):
+    def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(640, 480)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -49,17 +49,17 @@ class TelaPrincipal(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow, nome)
+        self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self, MainWindow, nome = '', saldo = 0.0):
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label.setText(_translate("MainWindow", "Menu"))
         self.pushButton.setText(_translate("MainWindow", "Saque"))
         self.pushButton_2.setText(_translate("MainWindow", "Deposito"))
-        self.label_2.setText(_translate("MainWindow", "Olá, %s" %(nome)))
-        self.label_3.setText(_translate("MainWindow", "Saldo: R$ %.2f" %(saldo)))
+        self.label_2.setText(_translate("MainWindow", "Olá Nome"))
+        self.label_3.setText(_translate("MainWindow", "Saldo: R$ 0.00"))
         self.pushButton_3.setText(_translate("MainWindow", "Extrato"))
         self.pushButton_4.setText(_translate("MainWindow", "Transferência"))
         self.pushButton_5.setText(_translate("MainWindow", "Voltar"))
