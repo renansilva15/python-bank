@@ -12,10 +12,7 @@ from telaTransferencia import TelaTransferencia
 from telaHistorico import TelaHistorico
 
 
-from conta import Conta
-from cliente import Cliente
-from historico import Historico
-from banco import Banco
+from conexaoCliente import ConexaoCliente
 
 
 
@@ -36,6 +33,11 @@ class Ui_Main(QtWidgets.QWidget):
 		self.stack4 = QtWidgets.QMainWindow()
 		self.stack5 = QtWidgets.QMainWindow()
 		self.stack6 = QtWidgets.QMainWindow()
+
+
+		self.cpfAtual = None
+		self.conexaoCliente = ConexaoCliente()
+		self.conexaoCliente.conectar()
 
 
 		self.telaInicial = TelaInicial()
@@ -77,9 +79,6 @@ class Main(QMainWindow, Ui_Main):
 		self.setupUi(self)
 
 
-		self.banco = Banco()
-
-
 		self.telaInicial.pushButton.clicked.connect(self.abrirTelaPrincipal)
 		self.telaInicial.pushButton_2.clicked.connect(self.abrirTelaCadastro)
 
@@ -117,34 +116,41 @@ class Main(QMainWindow, Ui_Main):
 
 
 		if(not(cpf == '' or senha == '')):
-			aux = self.banco.buscaCliente(cpf)
+			self.cpfAtual = cpf
+			aux = self.conexaoCliente.comunicar("{}/{}/{}".format(2, self.cpfAtual, senha))
 
 
-			if(aux):
-				if(aux.senha == senha):
-					self.telaInicial.lineEdit.setText('')
-					self.telaInicial.lineEdit_2.setText('')
+			if(aux == 'True'):
+				self.telaInicial.lineEdit.setText('')
+				self.telaInicial.lineEdit_2.setText('')
 
 
-					self.clienteAtual = aux #
-					self.contaAtual = self.banco.buscaConta(self.clienteAtual.cpf) #
+				aux = self.conexaoCliente.comunicar("{}/{}".format(4, self.cpfAtual))
+				aux = aux.split('/')
 
 
-					self.telaPrincipal.label_2.setText(str('Olá %s' %(self.clienteAtual.nome)))
-					self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(self.contaAtual.saldo)))
+				self.telaPrincipal.label_2.setText(str('Olá %s' %(aux[0])))
+				self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(float(aux[1]))))
 
 
-					self.QtStack.setCurrentIndex(1)
+				self.telaDeposito.lineEdit_3.setText('')
+				self.telaDeposito.lineEdit_4.setText('')
 
 
-				else:
-					self.telaInicial.lineEdit_2.setText('')
-					QMessageBox.information(None, '', 'Senha incorreta.')
+				self.telaSaque.lineEdit_3.setText('')
+				self.telaSaque.lineEdit_4.setText('')
+
+
+				self.telaTransferencia.lineEdit_3.setText('')
+				self.telaTransferencia.lineEdit_5.setText('')
+				self.telaTransferencia.lineEdit_4.setText('')
+				self.QtStack.setCurrentIndex(1)
+
 
 			else:
 				self.telaInicial.lineEdit.setText('')
 				self.telaInicial.lineEdit_2.setText('')
-				QMessageBox.information(None, '', 'CPF não cadastrado.')
+				QMessageBox.information(None, '', 'Não foi possível acessar, verifique seu CPF e senha.')
 
 
 		else:
@@ -167,31 +173,25 @@ class Main(QMainWindow, Ui_Main):
 
 
 		if(not(nome == '' or sobrenome == '' or cpf == '' or senha == '')):
-			aux = self.banco.buscaCliente(cpf)
+			self.cpfAtual = cpf
+			aux = self.conexaoCliente.comunicar("{}/{}/{}/{}/{}".format(1, self.cpfAtual, senha, nome, sobrenome))
 
 
-			if(aux == None):
+			if(aux == 'True'):
 				self.telaCadastro.lineEdit_3.setText('')
 				self.telaCadastro.lineEdit_4.setText('')
 				self.telaCadastro.lineEdit.setText('')
 				self.telaCadastro.lineEdit_2.setText('')
 
 
-				aux = self.banco.cadastraCliente(Cliente(nome, sobrenome, cpf, senha))
-				if(aux):
-					aux2 = self.banco.criaConta(cpf, Conta(Banco.totalContas(), cpf, 0.0, 0.0))
+				aux = int(self.conexaoCliente.comunicar("{}/{}".format(3, self.cpfAtual)))
 
 
-					QMessageBox.information(None, '', 'Cadastro realizado.\n\nO número da sua conta é: %d' %(Banco.totalContas()-1))
-					self.QtStack.setCurrentIndex(0)
-
-				else:
-					QMessageBox.information(None, '', 'Não foi possível realizar o cadastro.') #
+				QMessageBox.information(None, '', 'Cadastro realizado.\n\nO número da sua conta é: %d' %(aux))
+				self.QtStack.setCurrentIndex(0)
 
 			else:
-				self.telaInicial.lineEdit.setText('')
-				self.telaInicial.lineEdit_2.setText('')
-				QMessageBox.information(None, '', 'CPF já cadastrado.')
+				QMessageBox.information(None, '', 'Não foi possível realizar o cadastro.')
 
 
 		else:
@@ -204,6 +204,8 @@ class Main(QMainWindow, Ui_Main):
 		self.telaCadastro.lineEdit_4.setText('')
 		self.telaCadastro.lineEdit.setText('')
 		self.telaCadastro.lineEdit_2.setText('')
+
+
 		self.QtStack.setCurrentIndex(0)
 
 
@@ -220,27 +222,28 @@ class Main(QMainWindow, Ui_Main):
 
 		if(not(valor == '' or senha == '')):
 			if(valor > 0):
-				if(self.clienteAtual.senha == senha):
-					aux = self.banco.buscaConta(self.clienteAtual.cpf)
-					aux2 = aux.deposita(valor)
 
 
-					if(aux2):
-						self.telaDeposito.lineEdit_3.setText('')
-						self.telaDeposito.lineEdit_4.setText('')
-						QMessageBox.information(None, '', 'Depósito realizado.')
+				aux = self.conexaoCliente.comunicar("{}/{}/{}/{}".format(6, self.cpfAtual, senha, valor))
+				if(aux == 'True'):
+					self.telaDeposito.lineEdit_3.setText('')
+					self.telaDeposito.lineEdit_4.setText('')
+					QMessageBox.information(None, '', 'Depósito realizado.')
 
 
-						self.telaPrincipal.label_2.setText(str('Olá %s' %(self.clienteAtual.nome)))
-						self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(self.contaAtual.saldo)))
-						self.QtStack.setCurrentIndex(1)
+					aux = self.conexaoCliente.comunicar("{}/{}".format(4, self.cpfAtual))
+					aux = aux.split('/')
 
-					else:
-						QMessageBox.information(None, '', 'Não foi possível realizar o depósito.')
+
+					self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(float(aux[1]))))
+
+
+					self.QtStack.setCurrentIndex(1)
+
 
 				else:
 					self.telaDeposito.lineEdit_4.setText('')
-					QMessageBox.information(None, '', 'Senha incorreta.')
+					QMessageBox.information(None, '', 'Não foi possível realizar o depósito, senha incorreta.')
 
 			else:
 				QMessageBox.information(None, '', 'Valor inválido.')
@@ -267,29 +270,28 @@ class Main(QMainWindow, Ui_Main):
 
 		if(not(valor == '' or senha == '')):
 			if(valor > 0):
-				if(self.clienteAtual.senha == senha):
-					aux = self.banco.buscaConta(self.clienteAtual.cpf)
-					aux2 = aux.saca(valor)
 
 
-					if(aux2):
-						self.telaSaque.lineEdit_3.setText('')
-						self.telaSaque.lineEdit_4.setText('')
-						QMessageBox.information(None, '', 'Saque realizado.')
+				aux = self.conexaoCliente.comunicar("{}/{}/{}/{}".format(7, self.cpfAtual, senha, valor))
+				if(aux == 'True'):
+					self.telaSaque.lineEdit_3.setText('')
+					self.telaSaque.lineEdit_4.setText('')
+					QMessageBox.information(None, '', 'Saque realizado.')
 
 
-						self.telaPrincipal.label_2.setText(str('Olá %s' %(self.clienteAtual.nome)))
-						self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(self.contaAtual.saldo)))
-						self.QtStack.setCurrentIndex(1)
+					aux = self.conexaoCliente.comunicar("{}/{}".format(4, self.cpfAtual))
+					aux = aux.split('/')
 
-					else:
-						self.telaSaque.lineEdit_3.setText('')
-						self.telaSaque.lineEdit_4.setText('')
-						QMessageBox.information(None, '', 'Não foi possível realizar o saque. Saldo insuficiente.')
+
+					self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(float(aux[1]))))
+
+
+					self.QtStack.setCurrentIndex(1)
+
 
 				else:
-					self.telaSaque.lineEdit_4.setText('')
-					QMessageBox.information(None, '', 'Senha incorreta.')
+					self.telaDeposito.lineEdit_4.setText('')
+					QMessageBox.information(None, '', 'Não foi possível realizar o saque, verifique seu saldo e sua senha.')
 
 			else:
 				QMessageBox.information(None, '', 'Valor inválido.')
@@ -312,46 +314,29 @@ class Main(QMainWindow, Ui_Main):
 
 		if(not(valor == '' or cpfDestino == '' or senha == '')):
 			if(valor > 0):
-				aux3 = self.banco.buscaConta(cpfDestino)
 
 
-				if(aux3):
-					if(aux3 != self.contaAtual):
-						if(self.clienteAtual.senha == senha):
-							aux = self.banco.buscaConta(self.clienteAtual.cpf)
-							aux2 = aux.transfere(aux3, valor)
+				aux = self.conexaoCliente.comunicar("{}/{}/{}/{}/{}".format(8, self.cpfAtual, senha, valor, cpfDestino))
+				if(aux == 'True'):
+					self.telaTransferencia.lineEdit_3.setText('')
+					self.telaTransferencia.lineEdit_5.setText('')
+					self.telaTransferencia.lineEdit_4.setText('')
+					QMessageBox.information(None, '', 'Transferência realizada.')
 
 
-							if(aux2):
-								self.telaTransferencia.lineEdit_3.setText('')
-								self.telaTransferencia.lineEdit_5.setText('')
-								self.telaTransferencia.lineEdit_4.setText('')
-								QMessageBox.information(None, '', 'Transferência realizada.')
+					aux = self.conexaoCliente.comunicar("{}/{}".format(4, self.cpfAtual))
+					aux = aux.split('/')
 
-								self.telaPrincipal.label_2.setText(str('Olá %s' %(self.clienteAtual.nome)))
-								self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(self.contaAtual.saldo)))
-								self.QtStack.setCurrentIndex(1)
 
-							else:
-								self.telaTransferencia.lineEdit_3.setText('')
-								self.telaTransferencia.lineEdit_5.setText('')
-								self.telaTransferencia.lineEdit_4.setText('')
-								QMessageBox.information(None, '', 'Não foi possível realizar a transferência. Saldo insuficiente.')
+					self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(float(aux[1]))))
 
-						else:
-							self.telaTransferencia.lineEdit_4.setText('')
-							QMessageBox.information(None, '', 'Senha incorreta.')
 
-					else:
-						self.telaTransferencia.lineEdit_3.setText('')
-						self.telaTransferencia.lineEdit_5.setText('')
-						self.telaTransferencia.lineEdit_4.setText('')
-						QMessageBox.information(None, '', 'A conta destino não pode ser a conta atual.')
+					self.QtStack.setCurrentIndex(1)
+
 
 				else:
-					self.telaSaque.lineEdit_3.setText('')
-					self.telaSaque.lineEdit_4.setText('')
-					QMessageBox.information(None, '', 'Não foram encontaradas contas com este CPF.')
+					self.telaDeposito.lineEdit_4.setText('')
+					QMessageBox.information(None, '', 'Não foi possível realizar o saque, verifique seu saldo, sua senha e o CPF da conta destino.')
 
 			else:
 				QMessageBox.information(None, '', 'Valor inválido.')
@@ -362,8 +347,15 @@ class Main(QMainWindow, Ui_Main):
 
 
 	def abrirTelaHistorico(self):
-		self.telaHistorico.textEdit.setText('\nNúmero: {}\nTitular: {} {} | CPF: {}\nSaldo: R$ {:.2f}\nLimite: R$ {:.2f}\n{}'.format(self.contaAtual.numero, self.clienteAtual.nome, self.clienteAtual.sobrenome, self.clienteAtual.cpf, self.contaAtual.saldo, self.contaAtual.limite,self.contaAtual.extrato()))
-		self.QtStack.setCurrentIndex(6) # Mudar a linha acima.
+		aux = self.conexaoCliente.comunicar("{}/{}".format(5, self.cpfAtual))
+		aux = aux.split('/')
+
+
+		aux2 = self.conexaoCliente.comunicar("{}/{}".format(9, self.cpfAtual))
+
+
+		self.telaHistorico.textEdit.setText('\nNúmero: {}\nTitular: {} {} | CPF: {}\nSaldo: R$ {}\nLimite: R$ {}\n{}'.format(aux[0], aux[1], aux[2], aux[3], aux[4], aux[5], aux2))
+		self.QtStack.setCurrentIndex(6)
 
 
 
@@ -372,3 +364,4 @@ if __name__ == "__main__":
 	app = QtWidgets.QApplication(sys.argv)
 	show_main = Main()
 	sys.exit(app.exec_())
+	self.conexaoCliente.fechar()

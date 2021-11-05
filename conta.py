@@ -22,8 +22,8 @@ class Conta:
 	def __init__(self, numero, cpf, saldo, limite):
 		self._numero = numero
 		self._cpf = cpf
-		self._saldo = saldo
-		self._limite = limite
+		self._saldo = float(saldo)
+		self._limite = float(limite)
 		self._historico = Historico()
 		Conta._totalContas += 1
 

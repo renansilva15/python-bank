@@ -46,6 +46,7 @@ class Historico:
 		for l in self.transacoes:
 			#print(l)
 			aux += l
+			aux += '\n'
 
 
 		return aux
