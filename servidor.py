@@ -1,4 +1,6 @@
 import socket
+import threading
+
 
 
 from conta import Conta
@@ -8,31 +10,23 @@ from banco import Banco
 
 
 
-host = 'localhost'
-port = 8000
+class ConexaoServidor(threading.Thread):
+
+	def __init__(self, banco, clienteEndereco, conexao):
+		threading.Thread.__init__(self)
 
 
-class ConexaoServidor:
-
-	def __init__(self):
-		self.banco = Banco()
-		self.endereco = None
-		self.socket = None
-		self.conexao = None
+		self.banco = banco
+		self.clienteEndereco = clienteEndereco
+		self.conexao = conexao
+		print("Conexão com {}.".format(self.clienteEndereco))
 
 
 
-	def conectar(self):
-		self.endereco = ((host, port))
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		self.socket.bind(self.endereco)
-		self.socket.listen(10)
-		print('\nAguardando conexão...')
 
-		self.conexao, _ = self.socket.accept()
-		print('\nConectado.')
-		print('\nAguardando solicitações...')
+	def run(self):
+		while(self.funcionalidades() != False):
+			pass
 
 
 
@@ -42,7 +36,6 @@ class ConexaoServidor:
 
 
 		if(listaDados[0] == '1'): # Cadastro.
-			aux = self.banco.buscaCliente(listaDados[1])
 
 
 			aux = self.banco.cadastraCliente(Cliente(listaDados[3], listaDados[4], listaDados[1], listaDados[2]))
@@ -165,27 +158,35 @@ class ConexaoServidor:
 
 
 
-	def fechar(self):
-		self.socket.close()
-		print('\nFechado.')
+	# def fechar(self):
+	# 	self.socket.close()
+	# 	print('\nFechado.')
 
 
 
 if __name__ == '__main__':
-	servidor = ConexaoServidor()
-	fechar = ''
+	banco = Banco()
 
 
-	while(fechar == ''):
+	host = 'localhost'
+	port = 8000
 
 
-		servidor.conectar()
+	endereco = (host, port) #
+	servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	servidor.bind(endereco)
 
 
-		aux = True
-		while(aux):
-			aux = servidor.funcionalidades()
+
+	print('\nServidor iniciado.')
+	print('\nAguardando conexão.')
 
 
-		fechar = input('\n:')
-		servidor.fechar()
+	while(True):
+		servidor.listen(1)
+		conexao, clienteEndereco = servidor.accept()
+
+
+		novaThread = ConexaoServidor(banco, clienteEndereco, conexao)
+		novaThread.start()

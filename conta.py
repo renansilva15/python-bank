@@ -1,11 +1,12 @@
 import datetime
 from historico import Historico
+import threading
 
 
 
 class Conta:
 
-	__slots__ = ['_numero', '_cpf', '_saldo', '_limite', '_historico']
+	__slots__ = ['_numero', '_cpf', '_saldo', '_limite', '_historico', '_sinc']
 
 
 
@@ -26,6 +27,7 @@ class Conta:
 		self._limite = float(limite)
 		self._historico = Historico()
 		Conta._totalContas += 1
+		self._sinc = threading.Lock()
 
 
 
@@ -103,7 +105,11 @@ class Conta:
 
 
 		if(valor > 0 and self._saldo >= valor):
+			self._sinc.acquire()
 			self._saldo -= valor
+			self._sinc.release()
+
+
 			self._historico.transacoes.append('- Saque de R$ {:.2f} ({})\n'.format(valor, datetime.datetime.today().strftime('%d/%m/%Y %H:%M')))
 			aux = True
 
@@ -113,7 +119,6 @@ class Conta:
 
 
 	def extrato(self):
-		#print('\nNúmero: {}\nTitular: {} {} | CPF: {}\nSaldo: R$ {:.2f}\nLimite: R$ {:.2f}'.format(self._numero, self._cliente.nome, self._cliente.sobrenome, self._cliente.cpf, self._saldo, self._limite))
 	 	return self._historico.mostra()
 
 
@@ -123,8 +128,12 @@ class Conta:
 
 
 		if(type(destino) == type(self) and valor > 0 and self._saldo >= valor):
+			self._sinc.acquire()
 			self._saldo -= valor
+
+
 			destino._saldo += valor
+			self._sinc.release()
 
 
 			self._historico.transacoes.append('- Transferência de R$ {:.2f} para a conta "{}" ({})\n'.format(valor, destino._numero, datetime.datetime.today().strftime('%d/%m/%Y %H:%M')))

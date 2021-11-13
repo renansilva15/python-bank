@@ -254,6 +254,14 @@ class Main(QMainWindow, Ui_Main):
 
 
 	def botaoVoltarTelaPrincipal(self):
+		if(self.cpfAtual):
+			aux = self.conexaoCliente.comunicar("{}/{}".format(4, self.cpfAtual))
+			aux = aux.split('/')
+
+
+			self.telaPrincipal.label_3.setText(str('Saldo R$ %.2f' %(float(aux[1]))))
+
+
 		self.QtStack.setCurrentIndex(1)
 
 

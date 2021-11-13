@@ -20,7 +20,7 @@ class ConexaoCliente:
 
 
 
-	def comunicar(self, dados): # dados: str
+	def comunicar(self, dados):
 		self.clienteSocket.send(dados.encode())
 		dadosRecebidos = self.clienteSocket.recv(1024).decode()
 
@@ -30,5 +30,4 @@ class ConexaoCliente:
 
 
 	def fechar(self):
-		self.clienteSocket.send('Close'.encode())
 		self.clienteSocket.close()
