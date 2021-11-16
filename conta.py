@@ -91,9 +91,11 @@ class Conta:
 
 
 		if(valor > 0):
+			self._sinc.acquire()
 			self._saldo += valor
 			self._historico.transacoes.append('+ Depósito de R$ {:.2f} ({})\n'.format(valor, datetime.datetime.today().strftime('%d/%m/%Y %H:%M')))
 			aux = True
+			self._sinc.release()
 
 
 		return aux
@@ -107,11 +109,11 @@ class Conta:
 		if(valor > 0 and self._saldo >= valor):
 			self._sinc.acquire()
 			self._saldo -= valor
-			self._sinc.release()
 
 
 			self._historico.transacoes.append('- Saque de R$ {:.2f} ({})\n'.format(valor, datetime.datetime.today().strftime('%d/%m/%Y %H:%M')))
 			aux = True
+			self._sinc.release()
 
 
 		return aux
@@ -133,12 +135,12 @@ class Conta:
 
 
 			destino._saldo += valor
-			self._sinc.release()
 
 
 			self._historico.transacoes.append('- Transferência de R$ {:.2f} para a conta "{}" ({})\n'.format(valor, destino._numero, datetime.datetime.today().strftime('%d/%m/%Y %H:%M')))
 			destino._historico.transacoes.append('+ Recebe transferência de R$ {:.2f} da conta "{}" ({})\n'.format(valor, self._numero, datetime.datetime.today().strftime('%d/%m/%Y %H:%M')))
 			aux = True
+			self._sinc.release()
 
 
 		return aux
